@@ -8,6 +8,7 @@ type Action = ActionType<typeof actions>;
 
 const initialState: MintorStateType = {
   assetsList: [],
+  ownedAssetsList: [],
   
   
   
@@ -34,6 +35,9 @@ const initialState: MintorStateType = {
 const reducer = createReducer<MintorStateType, Action>(initialState)
   .handleAction(actions.setAssetsList, (state, action) => produce(state, (nexState) => {
     nexState.assetsList = action.payload;
+  }))
+  .handleAction(actions.setOwnedAssetsList, (state, action) => produce(state, (nexState) => {
+    nexState.ownedAssetsList = action.payload;
   }))
 
 

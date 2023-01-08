@@ -1,4 +1,5 @@
 import { GROTHS_IN_BEAM } from '@app/shared/constants';
+import BigNumber from "bignumber.js";
 
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
 const LENGTH_MAX = 8;
@@ -127,4 +128,20 @@ export async function calcRelayerFee (ethRate, currRate, gasPrice) {
   const relayCosts = RELAY_COSTS_IN_GAS * gasValue * ethRate / Math.pow(10, 9);
   const RELAY_SAFETY_COEFF = 2;//1.1;
   return RELAY_SAFETY_COEFF * relayCosts / currRate;
+}
+
+export function calcMintedAmount(mintedLo: number, mintedHi) {
+  // return mintedLo + (mintedHi * Math.pow(2, 64));
+  const expBy = (new BigNumber(2).exponentiatedBy(64));
+  return (new BigNumber(mintedLo).plus(new BigNumber(mintedHi).times(expBy))).toFixed();
+}
+
+export function parseMetadata(metadata) {
+  const splittedMetadata = metadata.split(';');
+  splittedMetadata.shift();
+  const obj = splittedMetadata.reduce((accumulator, value, index) => {
+    const data = value.split(/=(.*)/s);
+    return {...accumulator, [data[0]]: data[1]};
+  }, {});
+  return obj;
 }

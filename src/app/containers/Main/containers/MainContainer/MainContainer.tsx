@@ -18,7 +18,6 @@ const routes = [
   {
     path: ROUTES_PATH.MAIN.ASSET_PAGE,
     element: <AssetPage />,
-    exact: true,
   },
   {
     path: ROUTES_PATH.MAIN.CREATE_PAGE,

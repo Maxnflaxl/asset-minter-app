@@ -7,7 +7,10 @@ export interface Asset {
   metadata: string,
   mintedHi: number,
   mintedLo: number,
-  owner_pk: string
+  owner_pk: string,
+  parsedMetadata: any,
+  limitHi?: number,
+  limitLo?: number,
 }
 
 export interface IncomingTransaction {

@@ -12,7 +12,9 @@ interface CellConfig {
 interface TableProps {
   keyBy: string;
   data: any[];
+  dataToHighlight: any[];
   config: CellConfig[];
+  rowOnClick?: (value: any) => any;
 }
 
 const StyledTable = styled.table`
@@ -41,6 +43,16 @@ const Header = styled.th<{ active: boolean }>`
 const Column = styled.td`
   padding: 20px 30px;
   background-color: rgba(13, 77, 118, .9);
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+`;
+
+const TableTr = styled.tr<{isMine: boolean}>`
+  border-color: ${({ isMine }) => (isMine ? '#9ecaed' : '')} !important;
+  box-shadow: ${({ isMine }) => (isMine ? '0 0 10px #9ecaed' : '')} !important;
 `;
 
 const bodyClass = css`
@@ -49,7 +61,7 @@ const bodyClass = css`
   }
 `;
 
-const Table: React.FC<TableProps> = ({ keyBy, data, config }) => {
+const Table: React.FC<TableProps> = ({ keyBy, data, dataToHighlight, config, rowOnClick }) => {
   const [receiveClickedId, setActiveReceive] = useState(null);
   const isInProgress =  false 
 
@@ -97,14 +109,13 @@ const Table: React.FC<TableProps> = ({ keyBy, data, config }) => {
       </StyledThead>
       <tbody className={bodyClass}>
         {tableData && tableData.length > 0 ? tableData.sort(sortFn).map((item, index) => (
-          <tr key={index}>
+          <TableTr key={index} isMine={true}>
             {config.map(({ name, fn }, itemIndex) => {
               const value = item[name];
-              return (<Column key={itemIndex}>{!fn ? value : fn(value, item, index)}</Column>);
+              return (<Column onClick={()=>rowOnClick(item)} key={itemIndex}>{!fn ? value : fn(value, item, index)}</Column>);
             })}
-          </tr>
-        )): (<></>)
-      }
+          </TableTr>
+        )): (<></>)}
       </tbody>
     </StyledTable>
   ) ;

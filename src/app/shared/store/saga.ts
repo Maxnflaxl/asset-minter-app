@@ -16,8 +16,8 @@ import Utils from '@core/utils.js';
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
     Utils.initialize({
-      "appname": "BEAM Faucet",
-      "min_api_version": "6.2",
+      "appname": "BEAM SCAM App",
+      "min_api_version": "7.2",
       "headless": false,
       "apiResultHandler": (error, result, full) => {
         console.log('api result data: ', result, full);

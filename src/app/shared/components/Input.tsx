@@ -110,7 +110,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <ContainerStyled className={className} margin={margin}>
         <StyledInput valid={valid}>
-          <InputComponent ref={ref} valid={valid} onInput={handleInput} pallete={pallete} {...rest} />
+          <InputComponent autocomplete="off" ref={ref} valid={valid} onInput={handleInput} pallete={pallete} {...rest} />
         </StyledInput>
         {!!label && <LabelStyled valid={valid}>{label}</LabelStyled>}
       </ContainerStyled>

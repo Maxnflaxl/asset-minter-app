@@ -53,6 +53,9 @@ import IconDai from './icon-dai.svg';
 import IconLink from './icon-link.svg';
 import IconArrowManual from './icon-arrow-manual.svg';
 
+import AssetIcon from './icon-asset.svg';
+import BeamIcon from './icon-beam.svg';
+
 export {
   IconBack,
   IconReceive,
@@ -107,5 +110,8 @@ export {
   IconUsdt,
   IconWbtc,
   IconLink,
-  IconArrowManual
+  IconArrowManual,
+
+  AssetIcon,
+  BeamIcon
 }

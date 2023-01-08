@@ -4,16 +4,13 @@ import { css } from '@linaria/core';
 
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Window, Button, Table, Rate } from '@app/shared/components';
-import { selectAppParams,  selectRate } from '../../store/selectors';
+import { Window, Button, Table, Rate, AssetIcon } from '@app/shared/components';
+import { selectAppParams,  selectOwnedAssetsList,  selectRate } from '../../store/selectors';
 import { IconSend, IconReceive } from '@app/shared/icons';
-import { CURRENCIES, ROUTES } from '@app/shared/constants';
-// import { BridgeTransaction } from '@core/types';
-import { Transaction } from '@app/core/types';
-import { IconConfirm } from '@app/shared/icons';
-import { Receive } from '@core/api';
+import { ROUTES } from '@app/shared/constants';
 import { selectAssetsList } from '../../store/selectors';
 import { Asset } from '@app/core/types';
+import { calcMintedAmount } from '@core/appUtils';
 
 const Container = styled.div`
   display: flex;
@@ -45,25 +42,37 @@ const EmptyTableContent = styled.div`
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const assetsList = useSelector(selectAssetsList())
+  const assetsList = useSelector(selectAssetsList());
+  const ownedAssetsList = useSelector(selectOwnedAssetsList());
+
+  console.log(ownedAssetsList)
 
   const TABLE_CONFIG = [
     {
       name: 'aid',
-      title: 'Asset id',
+      title: 'Id',
       fn: (value: string, asset: Asset) => {
-        
         return (<>
           <span>{asset.aid}</span>
         </>);
       }
-    },
-    {
+    }, {
+      name: 'coin',
+      title: 'Coin',
+      fn: (value: string, asset: Asset) => {
+        return (<>
+          <span>
+            <AssetIcon asset_id={asset.aid}/>
+            {asset.parsedMetadata['N']}
+          </span>
+        </>);
+      }
+    }, {
       name: 'minted',
       title: 'Minted amount',
       fn: (value: any, asset: Asset, index: number) => {
         return (<>
-          {asset.mintedLo}
+          {calcMintedAmount(asset.mintedLo, asset.mintedHi)}
         </>);
       }
     }
@@ -73,12 +82,21 @@ const MainPage: React.FC = () => {
     navigate(ROUTES.MAIN.CREATE_PAGE);
   };
 
+  const handleAssetClick: React.MouseEventHandler = (item) => {
+    navigate(`${ROUTES.MAIN.ASSET_PAGE.replace(':id', '')}${item['aid']}`);
+  };
+
   return (
     <>
       <Window>
         <Container>
+          <Button
+            onClick={handleCreateClick}
+            pallete="green" 
+            variant="regular">create asset</Button>
           <StyledTable>
-            <Table config={TABLE_CONFIG} data={assetsList} keyBy='aid'/>
+            <Table config={TABLE_CONFIG} rowOnClick={handleAssetClick}
+              data={assetsList} dataToHighlight={ownedAssetsList} keyBy='aid'/>
               { assetsList.length === 0 && 
                 <EmptyTableContent>There are no assets yet</EmptyTableContent> }
           </StyledTable>

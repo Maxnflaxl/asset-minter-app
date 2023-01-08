@@ -2,8 +2,8 @@ import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES, CURRENCIES } from '@app/shared/constants';
 import { Asset } from '@core/types';
-import { LoadAssetsList } from '@core/api';
-import { calcRelayerFee } from '@core/appUtils';
+import { LoadAssetsList, LoadOwnedAssets } from '@core/api';
+import { calcRelayerFee, parseMetadata } from '@core/appUtils';
 
 import { actions } from '.';
 import store from '../../../../index';
@@ -20,7 +20,14 @@ export function* loadParamsSaga(
   ): Generator {
     try {
       const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as Asset[];
+
+      assetsList.forEach((asset) => {
+        asset['parsedMetadata'] = parseMetadata(asset.metadata);
+      });
       yield put(actions.setAssetsList(assetsList));
+
+      const ownedAssets = (yield call(LoadOwnedAssets)) as Asset[];
+      yield put(actions.setOwnedAssetsList(ownedAssets));
       
       // let bridgeTransactions: BridgeTransaction[] = [];
       // for (let curr of CURRENCIES) {

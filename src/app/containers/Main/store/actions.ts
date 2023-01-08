@@ -2,6 +2,7 @@ import { createAsyncAction, createAction } from 'typesafe-actions';
 import { Asset, FaucetAppParams, FaucetFund } from '@core/types';
 
 export const setAssetsList = createAction('@@MAIN/SET_ASSETS_LIST')<Asset[]>();
+export const setOwnedAssetsList = createAction('@@MAIN/SET_OWNED_ASSETS_LIST')<Asset[]>();
 
 
 export const setPk = createAction('@@MAIN/SET_PK')<string>();

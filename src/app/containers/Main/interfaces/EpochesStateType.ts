@@ -2,6 +2,9 @@ import { Asset, FaucetAppParams, FaucetFund } from '@core/types';
 
 export interface MintorStateType {
   assetsList: Asset[];
+  ownedAssetsList: Asset[];
+
+  
   pk: string;
   
   appParams: FaucetAppParams;

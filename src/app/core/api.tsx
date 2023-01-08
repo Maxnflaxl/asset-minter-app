@@ -12,6 +12,16 @@ export function LoadAssetsList<T = any>(payload): Promise<T> {
     });
 }
 
+export function LoadOwnedAssets<T = any>(): Promise<T> {
+    return new Promise((resolve, reject) => {
+        Utils.invokeContract("action=view_owned,cid="+CID, 
+        (error, result, full) => {
+            console.log(result.res)
+            resolve(result.res)
+        });
+    });
+}
+
 export function CreateAsset<T = any>(metadata): Promise<T> {
     return new Promise((resolve, reject) => {
         Utils.invokeContract("action=create_token,metadata=" + metadata + ",cid="+CID, 
