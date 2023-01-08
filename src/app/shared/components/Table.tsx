@@ -51,8 +51,7 @@ const Column = styled.td`
 `;
 
 const TableTr = styled.tr<{isMine: boolean}>`
-  border-color: ${({ isMine }) => (isMine ? '#9ecaed' : '')} !important;
-  box-shadow: ${({ isMine }) => (isMine ? '0 0 10px #9ecaed' : '')} !important;
+  background-color: ${({ isMine }) => (isMine ? 'rgb(0, 255, 70)' : '')} !important;
 `;
 
 const bodyClass = css`
@@ -66,10 +65,22 @@ const Table: React.FC<TableProps> = ({ keyBy, data, dataToHighlight, config, row
   const isInProgress =  false 
 
   const [filterBy, setFilterBy] = useState(0);
-  let tableData = [...data];
+  const updateTableData = (newData) => {
+    let res = [...newData];
+    res = res.sort(sortFn);
+    dataToHighlight.forEach(item => {
+      const index = res.findIndex(resItem => resItem.aid == item.aid);
+      const spliced = res.splice(index, 1);
+      res.unshift(spliced[0]);
+    });
+    
+    return res;
+  };
+
+  let tableData = updateTableData(data);
 
   useEffect(() => {
-    tableData = [...data];
+    tableData = updateTableData(data);
   },[data]);
 
   const sortFn = (objectA, objectB) => {
@@ -108,8 +119,8 @@ const Table: React.FC<TableProps> = ({ keyBy, data, dataToHighlight, config, row
         </tr>
       </StyledThead>
       <tbody className={bodyClass}>
-        {tableData && tableData.length > 0 ? tableData.sort(sortFn).map((item, index) => (
-          <TableTr key={index} isMine={true}>
+        {tableData && tableData.length > 0 ? tableData.map((item, index) => (
+          <TableTr key={index} isMine={dataToHighlight.some(el => el.aid === item.aid)}>
             {config.map(({ name, fn }, itemIndex) => {
               const value = item[name];
               return (<Column onClick={()=>rowOnClick(item)} key={itemIndex}>{!fn ? value : fn(value, item, index)}</Column>);

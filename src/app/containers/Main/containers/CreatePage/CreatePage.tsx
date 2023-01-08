@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { styled } from '@linaria/react';
-import { Button, Window, Input } from '@app/shared/components';
+import { Button, Window, Input, BackControl } from '@app/shared/components';
 import { css } from '@linaria/core';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useFormik } from 'formik';
 import { CreateAsset, UserWithdraw } from '@core/api';
+import { ROUTES } from '@app/shared/constants';
 
 interface CreateFormData {
   schema: string;
@@ -299,8 +300,13 @@ const CreatePage = () => {
   const isLogoUrlValid = () => !errors.logo_url;
   const isColorValid = () => !errors.color;
 
+  const onPreviousClick = () => {
+    navigate(ROUTES.MAIN.MAIN_PAGE);
+  };
+
   return (
     <Window>
+      <BackControl onPrevious={onPreviousClick}/>
       <form onSubmit={submitForm}>
         <Button //type="submit" 
           disabled={isFormDisabled()}
