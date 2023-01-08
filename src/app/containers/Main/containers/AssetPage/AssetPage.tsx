@@ -4,9 +4,10 @@ import { Button, Window, BackControl } from '@app/shared/components';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
-import { selectAssetFromList } from '../../store/selectors';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAssetFromList, selectIsOwnedAsset } from '../../store/selectors';
 import { ROUTES } from '@app/shared/constants';
+import { setPopupState } from '@app/containers/Main/store/actions';
 
 
 const Container = styled.div`
@@ -89,16 +90,28 @@ const EmptyTableContent = styled.div`
 
 const CreatePage = () => {
   const params = useParams();
+  const dispatch = useDispatch();
   const asset = useSelector(selectAssetFromList(params.id));
+  const isOwnedAsset = useSelector(selectIsOwnedAsset(params.id))
   const navigate = useNavigate();
 
   const onPreviousClick = () => {
     navigate(ROUTES.MAIN.MAIN_PAGE);
   };
 
+  const handleWithdrawClick = () => {
+    dispatch(setPopupState({type: 'withdraw', state: true}));
+  }
+
   return (
     <Window>
       <BackControl onPrevious={onPreviousClick}/>
+      {isOwnedAsset && 
+        <Button
+          onClick={handleWithdrawClick}
+          pallete="green" 
+          variant="regular">withdraw asset</Button>
+      }
       <Container>
         <div className='title-row'>
           <img className='icon' src={asset.parsedMetadata['OPT_FAVICON_URL']}/>

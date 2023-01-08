@@ -86,7 +86,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
     <ContainerStyled>
       <div className='input-area'>
         <Input
-          variant="proposal"
+          variant="prop"
           valid={!error}
           label={error}
           value={value}
@@ -96,16 +96,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
           className={containerStyle}
           onInput={handleInput}
         />
-        {!error && activeAsset === 0 && <Rate value={parseFloat(value)} className={rateStyle} />}
       </div>
-      <Select value={activeAsset} className={selectClassName} onSelect={handleSelect}>
-        {assets.map(({ getIcon, id, title }) => (
-          <Option key={id} value={id}>
-            {getIcon()}
-            <LabelStyled>{title}</LabelStyled>
-          </Option>
-        ))}
-      </Select>
       
     </ContainerStyled>
   );

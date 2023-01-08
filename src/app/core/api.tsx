@@ -31,6 +31,15 @@ export function CreateAsset<T = any>(metadata): Promise<T> {
     });
 }
 
+export function WithdrawOwnAsset<T = any>(value: number, aid: number): Promise<T> {
+    return new Promise((resolve, reject) => {
+        Utils.invokeContract("action=withdraw,cid="+CID+',value='+value+',aid='+aid, 
+        (error, result, full) => {
+            onMakeTx(error, result, full);
+        });
+    });
+}
+
 export function SendTo<T = any>(sendData, cid: string): Promise<T> {
     const { amount, address, fee, decimals } = sendData;
     const finalAmount = amount * Math.pow(10, decimals)

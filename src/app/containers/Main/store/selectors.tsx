@@ -7,6 +7,9 @@ export const selectAssetsList = () => createSelector(selectMain, (state) => stat
 export const selectAssetFromList = (id: string) => createSelector(selectMain, (state) => {
     return state.assetsList.find((asset) => asset['aid'] == id);
 });
+export const selectIsOwnedAsset = (id: string) => createSelector(selectMain, (state) => {
+    return state.ownedAssetsList.find((asset) => asset['aid'] == id);
+});
 export const selectOwnedAssetsList = () => createSelector(selectMain, (state) => state.ownedAssetsList);
 
 

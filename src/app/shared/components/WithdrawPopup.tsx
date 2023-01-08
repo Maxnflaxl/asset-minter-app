@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectErrorMessage, selectSystemState } from '@app/shared/store/selectors';
 import { useFormik } from 'formik';
 import { toGroths, fromGroths } from '@core/appUtils';
-import { UserWithdraw } from '@core/api';
+import { WithdrawOwnAsset } from '@core/api';
 import { styled } from '@linaria/react';
 import { css } from '@linaria/core';
 import { selectAppParams } from '@app/containers/Main/store/selectors';
@@ -73,12 +73,32 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
     setAsset(next);
   };
 
+  const handleValueChange = (e: string) => {
+    setFieldValue('withdraw_amount', e, true);
+  };
+
+  const formik = useFormik<WithdrawFormData>({
+    initialValues: {
+      withdraw_amount: '',
+    },
+    isInitialValid: false,
+    //validate: (e) => validate(e, setHint),
+    onSubmit: (value) => {
+      WithdrawOwnAsset(toGroths(parseFloat(value.withdraw_amount)), 54);
+      onCancel();
+      resetForm();
+    },
+  });
+
+  const {
+    values, setFieldValue, errors, submitForm, resetForm
+  } = formik;
 
   return (
     <Popup
       className={WithdrawPopupClass}
       visible={visible}
-      title="Get"
+      title="Withdraw"
       cancelButton={(
         <Button variant='ghost' className={WithdrawButtonsClass} icon={IconCancel} onClick={()=>{
             onCancel();
@@ -88,8 +108,8 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
       )}
       confirmButton={(
         <Button variant='regular' className={WithdrawButtonsClass} pallete='blue'
-        icon={IconWithdrawBlue} onClick={handleGet}>
-          Get
+          icon={IconWithdrawBlue} onClick={submitForm}>
+          withdraw
         </Button>
       )}
       onCancel={()=> {
@@ -97,7 +117,17 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
       }}
     >
       <AmountContainer>
-        
+        <form onSubmit={submitForm}>
+          <AmountInput
+            from='withdraw'
+            value={values.withdraw_amount}
+            error={errors.withdraw_amount?.toString()}
+            onChange={(e, aid) => {
+              // setAid(aid);
+              handleValueChange(e);
+            }}
+          />
+        </form>
       </AmountContainer>
     </Popup>
   );

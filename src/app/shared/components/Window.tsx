@@ -92,12 +92,9 @@ const Window: React.FC<WindowProps> = ({
         { children }
       </Container>
 
-      {/* <DepositPopup visible={popupsState.deposit} onCancel={()=>{
-        dispatch(setPopupState({type: 'deposit', state: false}));
-      }}/>
-      <WithdrawPopup visible={popupsState.withdraw} onCancel={()=>{
+      {<WithdrawPopup visible={popupsState.withdraw} onCancel={()=>{
         dispatch(setPopupState({type: 'withdraw', state: false}));
-      }}/> */}
+      }}/>}
     </>
   );
 };
