@@ -16,7 +16,7 @@ import Utils from '@core/utils.js';
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
     Utils.initialize({
-      "appname": "Beam Minter App",
+      "appname": "Beam Asset Minter App",
       "min_api_version": "7.2",
       "headless": false,
       "apiResultHandler": (error, result, full) => {

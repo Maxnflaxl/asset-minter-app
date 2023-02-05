@@ -706,7 +706,7 @@
 /*!*************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/@linaria/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/app/shared/components/Table.tsx ***!
   \*************************************************************************************************************************************************************************************************/
-.sualcge{width:630px;}
+.sualcge{width:80%;margin:0 auto;}.sualcge > tbody tr:last-child td:first-child{border-bottom-left-radius:10px;}.sualcge > tbody tr:last-child td:last-child{border-bottom-right-radius:10px;}.sualcge > thead tr:first-child th:first-child{border-top-left-radius:10px;}.sualcge > thead tr:first-child th:last-child{border-top-right-radius:10px;}
 .svveiz0{height:40px;border-radius:10px;background-color:rgba(255,255,255,0.08);}
 .h264i5t{text-align:left;color:var(--h264i5t-0);padding:15px 30px;}
 .c18unxsq{padding:20px 30px;background-color:rgba(13,77,118,.9);max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
@@ -742,7 +742,7 @@
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/@linaria/webpack5-loader/lib/outputCssLoader.js?cacheProvider=!./src/app/containers/Main/containers/MainPage/MainPage.tsx ***!
   \**********************************************************************************************************************************************************************************************************************/
 .cs2a0dm{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin:50px 0;}
-.shwovl0{margin-top:30px;border-radius:10px;overflow:hidden;}
+.shwovl0{margin-top:30px;width:100%;overflow:hidden;}
 .evtn89f{text-align:center;margin-top:72px;font-size:14px;font-style:italic;color:#8da1ad;}
 
 /*!**************************************************************************************************************************************************************************************************************************!*\
