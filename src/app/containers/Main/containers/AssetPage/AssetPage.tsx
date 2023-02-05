@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { styled } from '@linaria/react';
-import { Button, Window, BackControl } from '@app/shared/components';
+import { Button, Window, BackControl, AssetIcon } from '@app/shared/components';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectAssetFromList, selectIsOwnedAsset } from '../../store/selectors';
 import { ROUTES } from '@app/shared/constants';
 import { setPopupState } from '@app/containers/Main/store/actions';
+import { ViewAsset } from '@core/api';
+import { calcMintedAmount, fromGroths } from '@core/appUtils';
 
 
 const Container = styled.div`
@@ -94,13 +96,30 @@ const CreatePage = () => {
   const asset = useSelector(selectAssetFromList(params.id));
   const isOwnedAsset = useSelector(selectIsOwnedAsset(params.id))
   const navigate = useNavigate();
+  const [limit, setLimit] = useState('-')
+
+  const test = async (id) => {
+    const res = await ViewAsset(id);
+    return res;
+  };
+
+  useEffect(() => {
+    if (asset) {
+      ViewAsset(asset.aid).then((asset)=> {
+        console.log(asset);
+        if (asset) {
+          setLimit(fromGroths(parseInt(calcMintedAmount(asset.res.limitLo, asset.res.limitHi))) + '');
+        }
+      })
+    }
+  }, [asset]);
 
   const onPreviousClick = () => {
     navigate(ROUTES.MAIN.MAIN_PAGE);
   };
 
   const handleWithdrawClick = () => {
-    dispatch(setPopupState({type: 'withdraw', state: true}));
+    dispatch(setPopupState({type: 'withdraw', state: true, aid: params.id, ratio: asset.parsedMetadata['NTH_RATIO']}));
   }
 
   return (
@@ -110,17 +129,22 @@ const CreatePage = () => {
         <Button
           onClick={handleWithdrawClick}
           pallete="green" 
-          variant="regular">withdraw asset</Button>
+          variant="regular">mint asset</Button>
       }
       <Container>
         <div className='title-row'>
-          <img className='icon' src={asset.parsedMetadata['OPT_FAVICON_URL']}/>
+          <AssetIcon asset_id={asset.aid}/>
+          {/* <img className='icon' src={asset.parsedMetadata['OPT_FAVICON_URL']}/> */}
           <span className='sn'>{asset.parsedMetadata['SN']}</span>
           <span className='un'>{asset.parsedMetadata['UN']}</span>
         </div>
         <div className='row'>
           <div className='title'>Metadata Schema Version</div>
           <div className='value'>1</div>
+        </div>
+        <div className='row'>
+          <div className='title'>Asset id</div>
+          <div className='value'>{params.id}</div>
         </div>
         <div className='row'>
           <div className='title'>Asset name</div>
@@ -141,6 +165,10 @@ const CreatePage = () => {
         <div className='row'>
           <div className='title'>Ratio</div>
           <div className='value'>{asset.parsedMetadata['NTH_RATIO']}</div>
+        </div>
+        <div className='row'>
+          <div className='title'>Limit</div>
+          <div className='value'>{limit}</div>
         </div>
         <div className='row'>
           <div className='title'>Short Description</div>

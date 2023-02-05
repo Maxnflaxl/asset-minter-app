@@ -9,7 +9,7 @@ import { toGroths, fromGroths } from '@core/appUtils';
 import { WithdrawOwnAsset } from '@core/api';
 import { styled } from '@linaria/react';
 import { css } from '@linaria/core';
-import { selectAppParams } from '@app/containers/Main/store/selectors';
+import { selectAppParams, selectPopupState } from '@app/containers/Main/store/selectors';
 import Select, { Option } from '@app/shared/components/Select';
 
 interface WithdrawPopupProps {
@@ -26,21 +26,21 @@ const WithdrawButtonsClass = css`
 `;
 
 const AmountContainer = styled.div`
-    display: flex;
-    flex-align: row;
+    // display: flex;
+    // flex-align: row;
 
-    > .amount-input-class {
-        width: 340px !important;
-    }
+    // > .amount-input-class {
+    //     width: 340px !important;
+    // }
 
-    > .amount-max-class {
-        margin-top: 14px;
-        margin-left: 17px;
-        font-weight: bold;
-        font-size: 14px;
-        color: #0BCCF7;
-        display: flex;
-    }
+    // > .amount-max-class {
+    //     margin-top: 14px;
+    //     margin-left: 17px;
+    //     font-weight: bold;
+    //     font-size: 14px;
+    //     color: #0BCCF7;
+    //     display: flex;
+    // }
 `;
 
 const WithdrawPopupClass = css`
@@ -60,6 +60,7 @@ const LabelStyled = styled.div`
 
 const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
   const appParams = useSelector(selectAppParams());
+  const popupsState = useSelector(selectPopupState('withdraw'));
   const assets = [
     {id: 0, asset_id: 0, title: 'BEAM'},
     {id: 1, asset_id: 12, title: 'BEAMX'}
@@ -84,7 +85,7 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
     isInitialValid: false,
     //validate: (e) => validate(e, setHint),
     onSubmit: (value) => {
-      WithdrawOwnAsset(toGroths(parseFloat(value.withdraw_amount)), 54);
+      WithdrawOwnAsset(toGroths(parseFloat(value.withdraw_amount)), popupsState.aid);
       onCancel();
       resetForm();
     },
@@ -98,7 +99,7 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
     <Popup
       className={WithdrawPopupClass}
       visible={visible}
-      title="Withdraw"
+      title="Mint asset"
       cancelButton={(
         <Button variant='ghost' className={WithdrawButtonsClass} icon={IconCancel} onClick={()=>{
             onCancel();
@@ -109,7 +110,7 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
       confirmButton={(
         <Button variant='regular' className={WithdrawButtonsClass} pallete='blue'
           icon={IconWithdrawBlue} onClick={submitForm}>
-          withdraw
+          mint
         </Button>
       )}
       onCancel={()=> {

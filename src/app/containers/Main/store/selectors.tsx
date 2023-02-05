@@ -11,6 +11,7 @@ export const selectIsOwnedAsset = (id: string) => createSelector(selectMain, (st
     return state.ownedAssetsList.find((asset) => asset['aid'] == id);
 });
 export const selectOwnedAssetsList = () => createSelector(selectMain, (state) => state.ownedAssetsList);
+export const selectPopupState = (type: string) => createSelector(selectMain, (state) => state.popupsState[type]);
 
 
 export const selectAppParams = () => createSelector(selectMain, (state) => state.appParams);

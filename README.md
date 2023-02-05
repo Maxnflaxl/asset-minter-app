@@ -1,2 +1,2 @@
-# scam-app
-Secure Confidential Asset Manager
+# minter-app
+Secure Confidential Asset Minter

@@ -7,10 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button, Table, Rate, AssetIcon } from '@app/shared/components';
 import { selectAppParams,  selectOwnedAssetsList,  selectRate } from '../../store/selectors';
 import { IconSend, IconReceive } from '@app/shared/icons';
-import { ROUTES } from '@app/shared/constants';
+import { ROUTES, CID } from '@app/shared/constants';
 import { selectAssetsList } from '../../store/selectors';
 import { Asset } from '@app/core/types';
-import { calcMintedAmount } from '@core/appUtils';
+import { calcMintedAmount, fromGroths } from '@core/appUtils';
+import { selectSystemState } from '@app/shared/store/selectors';
 
 const Container = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ const StyledControls = styled.div`
 
 const StyledTable = styled.div`
   margin-top: 30px;
-  border-radius: 10px;
+  width: 100%;
   overflow: hidden;
 `;
 
@@ -44,8 +45,7 @@ const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const assetsList = useSelector(selectAssetsList());
   const ownedAssetsList = useSelector(selectOwnedAssetsList());
-
-  console.log(ownedAssetsList)
+  const systemState = useSelector(selectSystemState());
 
   const TABLE_CONFIG = [
     {
@@ -72,8 +72,38 @@ const MainPage: React.FC = () => {
       title: 'Minted amount',
       fn: (value: any, asset: Asset, index: number) => {
         return (<>
-          {calcMintedAmount(asset.mintedLo, asset.mintedHi)}
+          {fromGroths(parseInt(calcMintedAmount(asset.mintedLo, asset.mintedHi)))}
         </>);
+      }
+    }, {
+      name: 'minted_by',
+      title: 'Minted by',
+      fn: (value: any, asset: Asset, index: number) => {
+        return (<>
+          {
+            asset.owner_pk !== undefined && <>Wallet</>
+          }
+          {
+            asset.owner_cid !== undefined && asset.owner_cid === CID && <>Asset Minter</>
+          }
+          {
+            asset.owner_cid !== undefined && asset.owner_cid !== CID && <>Contract {asset.owner_cid}</>
+          }
+        </>);
+      }
+    }, {
+      name: 'emission',
+      title: 'First emission',
+      fn: (value: any, asset: Asset, index: number) => {
+        const heightDiff = systemState.current_height - asset.height;
+        const timestampDiff = systemState.current_state_timestamp * 1000 - heightDiff * 60000;
+        const dateDiff = new Date(timestampDiff);
+        const dateFromString = ('0' + dateDiff.getDate()).slice(-2) + '.' 
+          + ('0' + (dateDiff.getMonth()+1)).slice(-2) + '.' + dateDiff.getFullYear();
+
+        return (<span className='date'>
+          {dateFromString}
+        </span>);
       }
     }
   ];

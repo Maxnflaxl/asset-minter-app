@@ -22,12 +22,40 @@ interface CreateFormData {
   favicon_url: string;
   logo_url: string;
   color: string;
+  limit: string;
 }
 
 const COMMAND_BASIS_START = './beam-wallet asset_reg --pass 1 -n 127.0.0.1:10000 --asset_meta "';
 const PRE_COMMAND = 'STD:SCH_VER=1;'
 const COMMAND_BASIS_END = '" --fee 100000 --enable_assets';
 const RATIO_MAX = Math.pow(2, 128) - 2;
+
+const Command = styled.div`
+  padding: 20px;
+  background-color: rgba(0, 246, 210, .1);
+  border-radius: 10px;
+  margin-bottom: 10px;
+
+  > .text {
+    font-family: 'CourierRegular';
+    margin-top: 30px;
+    word-wrap: break-word;
+  }
+
+  > .empty-text {
+    font-style: italic;
+    text-align: center;
+    opacity: 0.5;
+    margin: 30px 0 10px;
+  }
+
+  > .copy-text {
+    font-style: italic;
+    text-align: center;
+    opacity: 0.5;
+    margin: 30px 0;
+  }
+`;
 
 const Container = styled.div`
   margin: 0 auto;
@@ -40,10 +68,14 @@ const Container = styled.div`
     flex-direction: column;
     height: 100%;
     width: 50%;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, .05);
-    border-radius: 10px;
     min-height: 0;
+
+    > .items {
+      padding: 20px;
+      background-color: rgba(255, 255, 255, .05);
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
   }
 
   > .side {
@@ -51,36 +83,9 @@ const Container = styled.div`
     width: 50%;
     display: flex;
     flex-direction: column;
-
-    > .command {
-      padding: 20px;
-      background-color: rgba(0, 246, 210, .1);
-      border-radius: 10px;
-
-      > .text {
-        font-family: 'CourierRegular';
-        margin-top: 30px;
-        word-wrap: break-word;
-      }
-
-      > .empty-text {
-        font-style: italic;
-        text-align: center;
-        opacity: 0.5;
-        margin: 30px 0 10px;
-      }
-
-      > .copy-text {
-        font-style: italic;
-        text-align: center;
-        opacity: 0.5;
-        margin: 30px 0;
-      }
-    }
     
     > .optional {
       padding: 20px;
-      margin-top: 10px;
       background-color: rgba(255, 255, 255, .05);
       border-radius: 10px;
     }
@@ -166,7 +171,7 @@ const CreatePage = () => {
 
     const name_regex = new RegExp('^[a-zA-Z0-9.,_-\\s]*$');
     const ration_regex = new RegExp('^[0-9]*');
-    const url_regex = new RegExp('^(?=.{4,2048}$)((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]{1,63}(\.[a-zA-Z]{1,63}){1,5}(\/)?.([\w\?[a-zA-Z-_%\/@?]+)*([^\/\w\?[a-zA-Z0-9_-]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$');
+    const url_regex = new RegExp('^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$');
     const color_regex = new RegExp('^#+([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$');
 
     if (!asset_name) {
@@ -227,10 +232,6 @@ const CreatePage = () => {
       errorsValidation.logo_url = `Wrong url format`;
     }
 
-    if (logo_url.length > 0 && !url_regex.test(logo_url)) {
-      errorsValidation.logo_url = `Wrong url format`;
-    }
-
     if (color.length > 0 && !color_regex.test(color)) {
       errorsValidation.color = `Wrong color`;
     }
@@ -245,14 +246,15 @@ const CreatePage = () => {
         unit_name: '',
         short_name: '',
         sm_unit_name: '',
-        ratio: '',
+        ratio: '100000000',
         short_descr: '',
         long_descr: '',
         site_url: '',
         pdf_url: '',
         favicon_url: '',
         logo_url: '',
-        color: ''
+        color: '',
+        limit: ''
     },
     isInitialValid: false,
     onSubmit: (value) => {
@@ -261,7 +263,8 @@ const CreatePage = () => {
   });
 
   const subm = () => {
-    CreateAsset(metadata)
+    CreateAsset(metadata, values.limit);
+    navigate(ROUTES.MAIN.MAIN_PAGE);
   }
 
   const handleAssetNameChange = (asset_name: string) => setFieldValue('asset_name', asset_name, true);
@@ -276,6 +279,7 @@ const CreatePage = () => {
   const handleFaviconUrlChange = (favicon_url: string) => setFieldValue('favicon_url', favicon_url, true);
   const handleLogoUrlChange = (logo_url: string) => setFieldValue('logo_url', logo_url, true);
   const handleColorChange = (color: string) => setFieldValue('color', color, true);
+  const handleLimitChange = (limit: string) => setFieldValue('limit', limit, true);
 
   const {
     values, setFieldValue, errors, submitForm, resetForm
@@ -299,6 +303,7 @@ const CreatePage = () => {
   const isFaviconUrlValid = () => !errors.favicon_url;
   const isLogoUrlValid = () => !errors.logo_url;
   const isColorValid = () => !errors.color;
+  const isLimitValid = () => !errors.limit;
 
   const onPreviousClick = () => {
     navigate(ROUTES.MAIN.MAIN_PAGE);
@@ -308,75 +313,79 @@ const CreatePage = () => {
     <Window>
       <BackControl onPrevious={onPreviousClick}/>
       <form onSubmit={submitForm}>
-        <Button //type="submit" 
-          disabled={isFormDisabled()}
-          onClick={()=>subm()}
-          pallete="green" 
-          variant="regular">create</Button>
         {/* <Button
           onClick={()=>UserWithdraw(50, 55)}
           pallete="green" 
           variant="regular">withdraw</Button> */}
-        <Container> 
+        <Command>
+          <SectionTitle>REGISTRATION COMMAND</SectionTitle>
+          {regCommand.length > 0 ? 
+          <>
+            <div className='text'>{regCommand}</div>
+            <div className='copy-text'>Copy and paste this command in command line</div>
+          </> :
+          <div className='empty-text'>Enter asset parameters</div>}
+        </Command>
+        <Container>
           <div className='mandatory'>
-            <SectionTitle>MANDATORY PROPERTIES</SectionTitle>
-            <SectionSubTitle valid={true}>Metadata Schema Version (SCH_VER=)</SectionSubTitle>
-            <Input placeholder=""
-              value={values.schema}
-              disabled={true}
-              variant="prop"
-              name="schema"/>
-            <SectionSubTitle valid={isAssetNameValid()}>Asset name (N=)</SectionSubTitle>
-            <Input placeholder=""
-              onChangeHandler={handleAssetNameChange}
-              valid={isAssetNameValid()}
-              value={values.asset_name}
-              label={errors.asset_name}
-              variant="prop"
-              name="asset_name"/>
-            <SectionSubTitle valid={isUnitNameValid()}>Asset unit name (UN=)</SectionSubTitle>
-            <Input placeholder=""
-              onChangeHandler={handleUnitNameChange}
-              valid={isUnitNameValid()}
-              value={values.unit_name}
-              label={errors.unit_name}
-              variant="prop"
-              name="unit_name"/>
-            <SectionSubTitle valid={isShortNameValid()}>Short name / asset code (SN=)</SectionSubTitle>
-            <Input placeholder=""
-              onChangeHandler={handleShortNameChange}
-              valid={isShortNameValid()}
-              value={values.short_name}
-              label={errors.short_name}
-              variant="prop"
-              name="short_name"/>
-            <SectionSubTitle valid={isSmallestUNValid()}>Smallest unit name (NTHUN=)</SectionSubTitle>
-            <Input placeholder=""
-              onChangeHandler={handleSmallestUNChange}
-              valid={isSmallestUNValid()}
-              value={values.sm_unit_name}
-              label={errors.sm_unit_name}
-              variant="prop"
-              name="sm_unit_name"/>
-            <SectionSubTitle valid={isRatioValid()}>Ratio (NTH_RATIO=)</SectionSubTitle>
-            <Input placeholder="100000000"
-              onChangeHandler={handleRatioChange}
-              valid={isRatioValid()}
-              value={values.ratio}
-              label={errors.ratio}
-              variant="prop"
-              name="ratio"/>
+            <div className='items'>
+              <SectionTitle>MANDATORY PROPERTIES</SectionTitle>
+              <SectionSubTitle valid={isAssetNameValid()}>Asset name (N=)</SectionSubTitle>
+              <Input placeholder=""
+                onChangeHandler={handleAssetNameChange}
+                valid={isAssetNameValid()}
+                value={values.asset_name}
+                label={errors.asset_name}
+                variant="prop"
+                name="asset_name"/>
+              <SectionSubTitle valid={isUnitNameValid()}>Asset unit name (UN=)</SectionSubTitle>
+              <Input placeholder=""
+                onChangeHandler={handleUnitNameChange}
+                valid={isUnitNameValid()}
+                value={values.unit_name}
+                label={errors.unit_name}
+                variant="prop"
+                name="unit_name"/>
+              <SectionSubTitle valid={isShortNameValid()}>Short name / asset code (SN=)</SectionSubTitle>
+              <Input placeholder=""
+                onChangeHandler={handleShortNameChange}
+                valid={isShortNameValid()}
+                value={values.short_name}
+                label={errors.short_name}
+                variant="prop"
+                name="short_name"/>
+              <SectionSubTitle valid={isSmallestUNValid()}>Smallest unit name (NTHUN=)</SectionSubTitle>
+              <Input placeholder=""
+                onChangeHandler={handleSmallestUNChange}
+                valid={isSmallestUNValid()}
+                value={values.sm_unit_name}
+                label={errors.sm_unit_name}
+                variant="prop"
+                name="sm_unit_name"/>
+              <SectionSubTitle valid={isRatioValid()}>Ratio (NTH_RATIO=)</SectionSubTitle>
+              <Input placeholder="100000000"
+                onChangeHandler={handleRatioChange}
+                valid={isRatioValid()}
+                value={values.ratio}
+                label={errors.ratio}
+                variant="prop"
+                name="ratio"/>
+              <SectionSubTitle valid={isLimitValid()}>Limit</SectionSubTitle>
+              <Input placeholder="100000000"
+                onChangeHandler={handleLimitChange}
+                valid={isLimitValid()}
+                value={values.limit}
+                label={errors.limit}
+                variant="prop"
+                name="limit"/>
+            </div>
+            <Button //type="submit" 
+              disabled={isFormDisabled()}
+              onClick={()=>subm()}
+              pallete="green" 
+              variant="regular">create asset</Button>
           </div>
           <div className='side'>
-            <div className='command'>
-              <SectionTitle>REGISTRATION COMMAND</SectionTitle>
-              {regCommand.length > 0 ? 
-              <>
-                <div className='text'>{regCommand}</div>
-                <div className='copy-text'>Copy and paste this command in command line</div>
-              </> :
-              <div className='empty-text'>Enter asset parameters</div>}
-            </div>
             <div className='optional'>
               <SectionTitle>OPTIONAL PROPERTIES</SectionTitle>
               <SectionSubTitle valid={isShortDescrValid()}>Short Description (OPT_SHORT_DESC=)</SectionSubTitle>

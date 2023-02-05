@@ -1,5 +1,9 @@
 import { Asset, FaucetAppParams, FaucetFund } from '@core/types';
 
+type Popup = {
+  isVisible: boolean,
+  aid?: string
+}
 export interface MintorStateType {
   assetsList: Asset[];
   ownedAssetsList: Asset[];
@@ -9,8 +13,7 @@ export interface MintorStateType {
   
   appParams: FaucetAppParams;
   popupsState: {
-    deposit: boolean;
-    withdraw: boolean;
+    withdraw: Popup;
   };
   rate: number;
   relayerFee: any;

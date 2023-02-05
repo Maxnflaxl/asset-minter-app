@@ -21,8 +21,9 @@ const initialState: MintorStateType = {
     withdrawLimit: 0
   },
   popupsState: {
-    withdraw: false,
-    deposit: false
+    withdraw: {
+      isVisible: false,
+    }
   },
   funds: [],
   relayerFee: null,
@@ -49,7 +50,11 @@ const reducer = createReducer<MintorStateType, Action>(initialState)
     nexState.appParams = action.payload;
   }))
   .handleAction(actions.setPopupState, (state, action) => produce(state, (nexState) => {
-    nexState.popupsState[action.payload.type] = action.payload.state;
+    nexState.popupsState[action.payload.type] = {
+      isVisible: action.payload.state,
+      aid: action.payload.aid ? action.payload.aid : null,
+      ratio: action.payload.ratio ? action.payload.ratio : null 
+    };
   }))
   .handleAction(actions.loadRate.success, (state, action) => produce(state, (nexState) => {
     nexState.rate = action.payload;

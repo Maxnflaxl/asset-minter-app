@@ -18,7 +18,23 @@ interface TableProps {
 }
 
 const StyledTable = styled.table`
-  width: 630px;
+  width: 80%;
+  margin: 0 auto;
+  > tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+  }
+      
+  > tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+  }
+  
+  > thead tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+  }
+      
+  > thead tr:first-child th:last-child {
+    border-top-right-radius: 10px;
+  }
 `;
 
 const StyledThead = styled.thead`

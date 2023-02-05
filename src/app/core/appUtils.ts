@@ -130,7 +130,7 @@ export async function calcRelayerFee (ethRate, currRate, gasPrice) {
   return RELAY_SAFETY_COEFF * relayCosts / currRate;
 }
 
-export function calcMintedAmount(mintedLo: number, mintedHi) {
+export function calcMintedAmount(mintedLo: number, mintedHi: number) {
   // return mintedLo + (mintedHi * Math.pow(2, 64));
   const expBy = (new BigNumber(2).exponentiatedBy(64));
   return (new BigNumber(mintedLo).plus(new BigNumber(mintedHi).times(expBy))).toFixed();

@@ -1,6 +1,7 @@
 import Utils from '@core/utils.js';
 import { toast } from 'react-toastify';
 import { CID } from '@app/shared/constants';
+import { toGroths } from './appUtils';
 
 
 export function LoadAssetsList<T = any>(payload): Promise<T> {
@@ -22,9 +23,9 @@ export function LoadOwnedAssets<T = any>(): Promise<T> {
     });
 }
 
-export function CreateAsset<T = any>(metadata): Promise<T> {
+export function CreateAsset<T = any>(metadata: string, limit: string): Promise<T> {
     return new Promise((resolve, reject) => {
-        Utils.invokeContract("action=create_token,metadata=" + metadata + ",cid="+CID, 
+        Utils.invokeContract("action=create_token,metadata=" + metadata + ",limit=" + toGroths(parseInt(limit)) + ",cid="+CID, 
         (error, result, full) => {
             onMakeTx(error, result, full);
         });
@@ -36,6 +37,16 @@ export function WithdrawOwnAsset<T = any>(value: number, aid: number): Promise<T
         Utils.invokeContract("action=withdraw,cid="+CID+',value='+value+',aid='+aid, 
         (error, result, full) => {
             onMakeTx(error, result, full);
+        });
+    });
+}
+
+export function ViewAsset<T = any>(aid): Promise<T> {
+    return new Promise((resolve, reject) => {
+        console.log("action=view_token,cid="+CID+',aid='+aid)
+        Utils.invokeContract("action=view_token,cid="+CID+',aid='+aid, 
+        (error, result, full) => {
+            resolve(result);
         });
     });
 }
