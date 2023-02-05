@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { styled } from '@linaria/react';
 import { Button, Window, BackControl, AssetIcon } from '@app/shared/components';
-import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAssetFromList, selectIsOwnedAsset } from '../../store/selectors';
-import { ROUTES } from '@app/shared/constants';
 import { setPopupState } from '@app/containers/Main/store/actions';
 import { ViewAsset } from '@core/api';
 import { calcMintedAmount, fromGroths } from '@core/appUtils';
+import { ROUTES, CID } from '@app/shared/constants';
+import { selectSystemState } from '@app/shared/store/selectors';
 
 
 const Container = styled.div`
@@ -96,7 +95,8 @@ const CreatePage = () => {
   const asset = useSelector(selectAssetFromList(params.id));
   const isOwnedAsset = useSelector(selectIsOwnedAsset(params.id))
   const navigate = useNavigate();
-  const [limit, setLimit] = useState('-')
+  const [limit, setLimit] = useState('-');
+  const systemState = useSelector(selectSystemState());
 
   const test = async (id) => {
     const res = await ViewAsset(id);
@@ -121,6 +121,12 @@ const CreatePage = () => {
   const handleWithdrawClick = () => {
     dispatch(setPopupState({type: 'withdraw', state: true, aid: params.id, ratio: asset.parsedMetadata['NTH_RATIO']}));
   }
+
+  const heightDiff = systemState.current_height - asset.height;
+  const timestampDiff = systemState.current_state_timestamp * 1000 - heightDiff * 60000;
+  const dateDiff = new Date(timestampDiff);
+  const dateFromString = ('0' + dateDiff.getDate()).slice(-2) + '.' 
+    + ('0' + (dateDiff.getMonth()+1)).slice(-2) + '.' + dateDiff.getFullYear();
 
   return (
     <Window>
@@ -165,6 +171,24 @@ const CreatePage = () => {
         <div className='row'>
           <div className='title'>Ratio</div>
           <div className='value'>{asset.parsedMetadata['NTH_RATIO']}</div>
+        </div>
+        <div className='row'>
+          <div className='title'>Minted by</div>
+          <div className='value'>
+            {
+              asset.owner_pk !== undefined && <>Wallet</>
+            }
+            {
+              asset.owner_cid !== undefined && asset.owner_cid === CID && <>Asset Minter</>
+            }
+            {
+              asset.owner_cid !== undefined && asset.owner_cid !== CID && <>Contract {asset.owner_cid}</>
+            }
+          </div>
+        </div>
+        <div className='row'>
+          <div className='title'>First emission</div>
+          <div className='value'>{dateFromString}</div>
         </div>
         <div className='row'>
           <div className='title'>Limit</div>
