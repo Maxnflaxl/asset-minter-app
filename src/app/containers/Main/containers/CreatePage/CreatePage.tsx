@@ -141,6 +141,7 @@ const CreatePage = () => {
         short_name,
         sm_unit_name,
         ratio,
+        limit,
         short_descr,
         long_descr,
         site_url,
@@ -169,8 +170,9 @@ const CreatePage = () => {
     //   errorsValidation.send_amount = `Insufficient amount`;
     // }
 
-    const name_regex = new RegExp('^[a-zA-Z0-9.,_-\\s]*$');
-    const ration_regex = new RegExp('^[0-9]*');
+    const name_regex = new RegExp('^[a-zA-Z0-9]*$');
+    const num_regex = new RegExp('^[0-9]*$');
+    const num_lim_regex = new RegExp('^([0-9]*[.])?[0-9]+$');
     const url_regex = new RegExp('^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$');
     const color_regex = new RegExp('^#+([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$');
 
@@ -204,8 +206,14 @@ const CreatePage = () => {
       errorsValidation.ratio = `Required`;
     } else if (parseFloat(ratio) > RATIO_MAX) {
       errorsValidation.ratio = `Value is too big`;
-    } else if (!ration_regex.test(ratio)) {
+    } else if (!num_regex.test(ratio)) {
       errorsValidation.ratio = `Incorrect value`;
+    }
+
+    if (!limit) {
+      errorsValidation.limit = `Required`;
+    } else if (!num_lim_regex.test(limit)) {
+      errorsValidation.limit = `Incorrect value`;
     }
 
     if (short_descr.length > 124) {
