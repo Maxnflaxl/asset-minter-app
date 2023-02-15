@@ -1,14 +1,15 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate } from '@app/shared/store/actions';
-import { ROUTES, CURRENCIES } from '@app/shared/constants';
+import { ROUTES, CURRENCIES, CID } from '@app/shared/constants';
 import { Asset } from '@core/types';
-import { LoadAssetsList, LoadOwnedAssets } from '@core/api';
+import { LoadAssetsList, LoadOwnedAssets, ViewAsset } from '@core/api';
 import { calcRelayerFee, parseMetadata } from '@core/appUtils';
-
+import { calcMintedAmount, fromGroths } from '@core/appUtils';
 import { actions } from '.';
 import store from '../../../../index';
 import { setIsLoaded } from '@app/shared/store/actions';
-import { selectIsLoaded } from '@app/shared/store/selectors';
+import { selectIsLoaded, selectSystemState } from '@app/shared/store/selectors';
+import { SystemState } from '@core/types';
 
 const FETCH_INTERVAL = 5000;
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
@@ -20,32 +21,43 @@ export function* loadParamsSaga(
   ): Generator {
     try {
       const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as Asset[];
-
-      assetsList.forEach((asset) => {
-        asset['parsedMetadata'] = parseMetadata(asset.metadata);
-      });
-      yield put(actions.setAssetsList(assetsList));
-
       const ownedAssets = (yield call(LoadOwnedAssets)) as Asset[];
-      yield put(actions.setOwnedAssetsList(ownedAssets));
-      
-      // let bridgeTransactions: BridgeTransaction[] = [];
-      // for (let curr of CURRENCIES) {
-      //   const trs = (yield call(LoadIncoming, curr.cid)) as IncomingTransaction[];
-       
-      //   trs.forEach((item, i) => {
-      //     bridgeTransactions.push({
-      //       amount: item.amount,
-      //       cid: curr.cid,
-      //       pid: i,
-      //       id: item.MsgId,
-      //       status: ''
-      //     })
-      //   });
-      // }
 
-      // yield put(actions.setBridgeTransactions(bridgeTransactions));
-    
+      const systemState = (yield select(selectSystemState())) as SystemState;
+      for (let i = 0; i < assetsList.length; i++) {
+        assetsList[i]['parsedMetadata'] = parseMetadata(assetsList[i].metadata);
+        assetsList[i]['coin'] = assetsList[i].parsedMetadata['N'];
+        assetsList[i]['minted'] = fromGroths(parseInt(calcMintedAmount(assetsList[i].mintedLo, assetsList[i].mintedHi)));
+        const heightDiff = systemState.current_height - assetsList[i].height;
+        const timestampDiff = systemState.current_state_timestamp * 1000 - heightDiff * 60000;
+        assetsList[i]['emission'] = new Date(timestampDiff);
+
+        if (assetsList[i].owner_cid !== undefined) {
+          if (assetsList[i].owner_cid === CID) {
+            assetsList[i]['minted_by'] = 'Asset Minter';
+            const assetInfo = (yield call(ViewAsset, assetsList[i].aid)) as {res: any};
+            assetsList[i]['max_supply'] = fromGroths(parseInt(calcMintedAmount(assetInfo.res.limitLo, assetInfo.res.limitHi)));
+          } else {
+            assetsList[i]['minted_by'] = `Contract ${assetsList[i].owner_cid}`;
+            assetsList[i]['max_supply'] = 'Unlimited';
+          }
+        }
+
+        if (assetsList[i].owner_pk !== undefined) {
+          assetsList[i]['minted_by'] = 'Wallet';
+          assetsList[i]['max_supply'] = 'Unlimited';
+        }
+      };
+
+      ownedAssets.forEach(item => {
+        const index = assetsList.findIndex(resItem => resItem.aid == item.aid);
+        const spliced = assetsList.splice(index, 1);
+        assetsList.unshift(spliced[0]);
+      });
+
+      yield put(actions.setAssetsList(assetsList));
+      yield put(actions.setOwnedAssetsList(ownedAssets));
+        
       const isLoaded = yield select(selectIsLoaded());
       if (!isLoaded) {
         store.dispatch(setIsLoaded(true));

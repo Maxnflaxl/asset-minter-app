@@ -47,6 +47,16 @@ const InputRegularStyled = styled(InputStyled)`
 const InputGrayStyled = styled(InputStyled)`
   border-width: 1px;
   border-color: ${({ valid }) => (valid ? 'rgba(255,255,255,0.3)' : 'var(--color-red)')};
+  border-bottom: none;
+  margin-top: 5px;
+  width: 300px;
+  
+  &::placeholder {
+    color: white;
+    opacity: 0.3;
+    font-size: 14px;
+    font-style: italic;
+  }
 `;
 
 const InputPropStyled = styled(InputStyled)<InputProps>`

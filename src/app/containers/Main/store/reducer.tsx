@@ -9,11 +9,7 @@ type Action = ActionType<typeof actions>;
 const initialState: MintorStateType = {
   assetsList: [],
   ownedAssetsList: [],
-  
-  
-  
   pk: '',
-
   appParams: {
     backlogPeriod: 0,
     enabled: 0,
@@ -42,10 +38,6 @@ const reducer = createReducer<MintorStateType, Action>(initialState)
   }))
 
 
-
-
-
-
   .handleAction(actions.loadAppParams.success, (state, action) => produce(state, (nexState) => {
     nexState.appParams = action.payload;
   }))
@@ -53,6 +45,7 @@ const reducer = createReducer<MintorStateType, Action>(initialState)
     nexState.popupsState[action.payload.type] = {
       isVisible: action.payload.state,
       aid: action.payload.aid ? action.payload.aid : null,
+      n: action.payload.n ? action.payload.n : null,
       ratio: action.payload.ratio ? action.payload.ratio : null 
     };
   }))

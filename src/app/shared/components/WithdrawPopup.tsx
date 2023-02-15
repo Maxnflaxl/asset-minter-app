@@ -1,16 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, AmountInput, Popup, Rate } from '@app/shared/components';
-import { IconCancel, IconWithdrawBlue, IconAddMax } from '@app/shared/icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectErrorMessage, selectSystemState } from '@app/shared/store/selectors';
+import React, { useState } from 'react';
+import { Button, AmountInput, Popup, AssetIcon } from '@app/shared/components';
+import { IconCancel, IconWithdrawBlue } from '@app/shared/icons';
+import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
-import { toGroths, fromGroths } from '@core/appUtils';
+import { toGroths } from '@core/appUtils';
 import { WithdrawOwnAsset } from '@core/api';
 import { styled } from '@linaria/react';
 import { css } from '@linaria/core';
 import { selectAppParams, selectPopupState } from '@app/containers/Main/store/selectors';
-import Select, { Option } from '@app/shared/components/Select';
 
 interface WithdrawPopupProps {
   visible?: boolean;
@@ -26,54 +24,24 @@ const WithdrawButtonsClass = css`
 `;
 
 const AmountContainer = styled.div`
-    // display: flex;
-    // flex-align: row;
+  > .mint-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
-    // > .amount-input-class {
-    //     width: 340px !important;
-    // }
-
-    // > .amount-max-class {
-    //     margin-top: 14px;
-    //     margin-left: 17px;
-    //     font-weight: bold;
-    //     font-size: 14px;
-    //     color: #0BCCF7;
-    //     display: flex;
-    // }
+    > .asset-icon {
+      margin-left: auto;
+    }
+  }
 `;
 
 const WithdrawPopupClass = css`
     width: 450px !important;
 `;
 
-const selectClassName = css`
-  align-self: flex-start;
-  margin: 10px auto 0;
-`;
-
-const LabelStyled = styled.div`
-  display: inline-block;
-  vertical-align: bottom;
-  line-height: 26px;
-`;
-
 const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
-  const appParams = useSelector(selectAppParams());
   const popupsState = useSelector(selectPopupState('withdraw'));
-  const assets = [
-    {id: 0, asset_id: 0, title: 'BEAM'},
-    {id: 1, asset_id: 12, title: 'BEAMX'}
-  ]
-
-  const [activeAsset, setAsset] = useState(assets[0].id);
-  const handleGet = () => {
-    
-  }
-  const handleSelect = (next) => {
-    setAsset(next);
-  };
-
+  
   const handleValueChange = (e: string) => {
     setFieldValue('withdraw_amount', e, true);
   };
@@ -118,16 +86,18 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
       }}
     >
       <AmountContainer>
-        <form onSubmit={submitForm}>
+        <form className='mint-form' onSubmit={submitForm}>
           <AmountInput
             from='withdraw'
             value={values.withdraw_amount}
             error={errors.withdraw_amount?.toString()}
             onChange={(e, aid) => {
-              // setAid(aid);
               handleValueChange(e);
             }}
           />
+          <AssetIcon className='asset-icon' asset_id={popupsState.aid}/>
+          {popupsState.n}
+          {' (id:'+popupsState.aid+')'}
         </form>
       </AmountContainer>
     </Popup>

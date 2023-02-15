@@ -21,18 +21,12 @@ interface AmountInputProps {
   onChange?: (value: string, activeAsset: number) => void; //TODO
 }
 
-const selectClassName = css`
-  align-self: flex-start;
-  margin-top: 10px;
-`;
-
 const ContainerStyled = styled.div`
   position: relative;
   display: flex;
-  margin-bottom: 20px;
 
   > .input-area {
-    width: 80%;
+    width: 255px;
   }
 `;
 
@@ -96,8 +90,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
           className={containerStyle}
           onInput={handleInput}
         />
-      </div>
-      
+      </div>  
     </ContainerStyled>
   );
 };

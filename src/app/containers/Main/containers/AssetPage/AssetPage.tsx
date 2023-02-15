@@ -27,7 +27,7 @@ const Container = styled.div`
     }
     
     > .value {
-      max-width: 500px;
+      max-width: 600px;
       word-wrap: break-word;
 
       > .ref {
@@ -74,19 +74,14 @@ const Container = styled.div`
   }
 `;
 
+const TopContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
 
-const StyledTable = styled.div`
-  margin-top: 30px;
-  border-radius: 10px;
-  overflow: hidden;
-`;
-
-const EmptyTableContent = styled.div`
-  text-align: center;
-  margin-top: 72px;
-  font-size: 14px;
-  font-style: italic;
-  color: #8da1ad;
+  > .mint-asset {
+    margin: 0 0 0 auto;
+  }
 `;
 
 const CreatePage = () => {
@@ -95,20 +90,14 @@ const CreatePage = () => {
   const asset = useSelector(selectAssetFromList(params.id));
   const isOwnedAsset = useSelector(selectIsOwnedAsset(params.id))
   const navigate = useNavigate();
-  const [limit, setLimit] = useState('-');
+  const [limit, setLimit] = useState(0);
   const systemState = useSelector(selectSystemState());
-
-  const test = async (id) => {
-    const res = await ViewAsset(id);
-    return res;
-  };
 
   useEffect(() => {
     if (asset) {
       ViewAsset(asset.aid).then((asset)=> {
-        console.log(asset);
         if (asset) {
-          setLimit(fromGroths(parseInt(calcMintedAmount(asset.res.limitLo, asset.res.limitHi))) + '');
+          setLimit(fromGroths(parseInt(calcMintedAmount(asset.res.limitLo, asset.res.limitHi))));
         }
       })
     }
@@ -119,7 +108,13 @@ const CreatePage = () => {
   };
 
   const handleWithdrawClick = () => {
-    dispatch(setPopupState({type: 'withdraw', state: true, aid: params.id, ratio: asset.parsedMetadata['NTH_RATIO']}));
+    dispatch(setPopupState({
+      type: 'withdraw',
+      state: true,
+      aid: params.id,
+      ratio: asset.parsedMetadata['NTH_RATIO'],
+      n: asset.parsedMetadata['N']
+    }));
   }
 
   const heightDiff = systemState.current_height - asset.height;
@@ -130,13 +125,16 @@ const CreatePage = () => {
 
   return (
     <Window>
-      <BackControl onPrevious={onPreviousClick}/>
-      {isOwnedAsset && 
-        <Button
-          onClick={handleWithdrawClick}
-          pallete="green" 
-          variant="regular">mint asset</Button>
-      }
+      <TopContainer>
+        <BackControl onPrevious={onPreviousClick}/>
+        {isOwnedAsset && 
+          <Button
+            className='mint-asset'
+            onClick={handleWithdrawClick}
+            pallete="green" 
+            variant="regular">mint asset</Button>
+        }
+      </TopContainer>
       <Container>
         <div className='title-row'>
           <AssetIcon asset_id={asset.aid}/>
@@ -170,7 +168,7 @@ const CreatePage = () => {
         </div>
         <div className='row'>
           <div className='title'>Ratio</div>
-          <div className='value'>{asset.parsedMetadata['NTH_RATIO']}</div>
+          <div className='value'>{asset.parsedMetadata['NTH_RATIO'] > 0 ? asset.parsedMetadata['NTH_RATIO'] : '100000000'}</div>
         </div>
         <div className='row'>
           <div className='title'>Minted by</div>
@@ -191,8 +189,12 @@ const CreatePage = () => {
           <div className='value'>{dateFromString}</div>
         </div>
         <div className='row'>
-          <div className='title'>Limit</div>
-          <div className='value'>{limit}</div>
+          <div className='title'>Minted amount</div>
+          <div className='value'>{asset['minted']}</div>
+        </div>
+        <div className='row'>
+          <div className='title'>Max supply</div>
+          <div className='value'>{limit > 0 ? limit : 'Unlimited'}</div>
         </div>
         <div className='row'>
           <div className='title'>Short Description</div>

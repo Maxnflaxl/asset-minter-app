@@ -92,6 +92,20 @@ const Container = styled.div`
   }
 `;
 
+const TopContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+
+  > .show-reg {
+    margin: 0 0 0 20px;
+  }
+
+  > .create-asset {
+    margin: 0 0 0 auto;
+  }
+`;
+
 const SectionTitle = styled.div`
   font-size: 14px;
   font-weight: 700;
@@ -108,6 +122,7 @@ const SectionSubTitle = styled.div<{valid?: boolean}>`
 const CreatePage = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [regCommand, setRegCommand] = useState('');
+  const [isCommandVisible, setIsCommandVisible] = useState(false);
   const [metadata, setMetadata] = useState('');
   const navigate = useNavigate();
 
@@ -317,28 +332,47 @@ const CreatePage = () => {
     navigate(ROUTES.MAIN.MAIN_PAGE);
   };
 
+  const onShowCommandClick = () => {
+    setIsCommandVisible(!isCommandVisible);
+  };
+
   return (
     <Window>
-      <BackControl onPrevious={onPreviousClick}/>
+      <TopContainer>
+        <BackControl onPrevious={onPreviousClick}/>
+        <Button
+          className='create-asset'
+          disabled={isFormDisabled()}
+          onClick={()=>subm()}
+          pallete="green" 
+          variant="regular">create asset</Button>
+        <Button
+          className='show-reg'
+          onClick={()=>onShowCommandClick()}
+          pallete="blue" 
+          variant="regular">show registration command</Button>
+      </TopContainer>
       <form onSubmit={submitForm}>
         {/* <Button
           onClick={()=>UserWithdraw(50, 55)}
           pallete="green" 
           variant="regular">withdraw</Button> */}
-        <Command>
-          <SectionTitle>REGISTRATION COMMAND</SectionTitle>
-          {regCommand.length > 0 ? 
-          <>
-            <div className='text'>{regCommand}</div>
-            <div className='copy-text'>Copy and paste this command in command line</div>
-          </> :
-          <div className='empty-text'>Enter asset parameters</div>}
-        </Command>
+        { isCommandVisible &&
+          <Command>
+            <SectionTitle>REGISTRATION COMMAND</SectionTitle>
+            {regCommand.length > 0 ? 
+            <>
+              <div className='text'>{regCommand}</div>
+              <div className='copy-text'>Copy and paste this command in command line</div>
+            </> :
+            <div className='empty-text'>Enter asset parameters</div>}
+          </Command>
+        }
         <Container>
           <div className='mandatory'>
             <div className='items'>
               <SectionTitle>MANDATORY PROPERTIES</SectionTitle>
-              <SectionSubTitle valid={isAssetNameValid()}>Asset name (N=)</SectionSubTitle>
+              <SectionSubTitle valid={isAssetNameValid()}>Asset name</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleAssetNameChange}
                 valid={isAssetNameValid()}
@@ -346,7 +380,7 @@ const CreatePage = () => {
                 label={errors.asset_name}
                 variant="prop"
                 name="asset_name"/>
-              <SectionSubTitle valid={isUnitNameValid()}>Asset unit name (UN=)</SectionSubTitle>
+              <SectionSubTitle valid={isUnitNameValid()}>Asset unit name</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleUnitNameChange}
                 valid={isUnitNameValid()}
@@ -354,7 +388,7 @@ const CreatePage = () => {
                 label={errors.unit_name}
                 variant="prop"
                 name="unit_name"/>
-              <SectionSubTitle valid={isShortNameValid()}>Short name / asset code (SN=)</SectionSubTitle>
+              <SectionSubTitle valid={isShortNameValid()}>Short name / asset code</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleShortNameChange}
                 valid={isShortNameValid()}
@@ -362,7 +396,7 @@ const CreatePage = () => {
                 label={errors.short_name}
                 variant="prop"
                 name="short_name"/>
-              <SectionSubTitle valid={isSmallestUNValid()}>Smallest unit name (NTHUN=)</SectionSubTitle>
+              <SectionSubTitle valid={isSmallestUNValid()}>Smallest unit name</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleSmallestUNChange}
                 valid={isSmallestUNValid()}
@@ -370,7 +404,7 @@ const CreatePage = () => {
                 label={errors.sm_unit_name}
                 variant="prop"
                 name="sm_unit_name"/>
-              <SectionSubTitle valid={isRatioValid()}>Ratio (NTH_RATIO=)</SectionSubTitle>
+              <SectionSubTitle valid={isRatioValid()}>Ratio</SectionSubTitle>
               <Input placeholder="100000000"
                 onChangeHandler={handleRatioChange}
                 valid={isRatioValid()}
@@ -378,7 +412,7 @@ const CreatePage = () => {
                 label={errors.ratio}
                 variant="prop"
                 name="ratio"/>
-              <SectionSubTitle valid={isLimitValid()}>Limit</SectionSubTitle>
+              <SectionSubTitle valid={isLimitValid()}>Max supply</SectionSubTitle>
               <Input placeholder="100000000"
                 onChangeHandler={handleLimitChange}
                 valid={isLimitValid()}
@@ -387,16 +421,11 @@ const CreatePage = () => {
                 variant="prop"
                 name="limit"/>
             </div>
-            <Button //type="submit" 
-              disabled={isFormDisabled()}
-              onClick={()=>subm()}
-              pallete="green" 
-              variant="regular">create asset</Button>
           </div>
           <div className='side'>
             <div className='optional'>
               <SectionTitle>OPTIONAL PROPERTIES</SectionTitle>
-              <SectionSubTitle valid={isShortDescrValid()}>Short Description (OPT_SHORT_DESC=)</SectionSubTitle>
+              <SectionSubTitle valid={isShortDescrValid()}>Short Description</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleShortDescrChange}
                 valid={isShortDescrValid()}
@@ -404,7 +433,7 @@ const CreatePage = () => {
                 label={errors.short_descr}
                 variant="prop"
                 name="short_descr"/>
-              <SectionSubTitle valid={isLongDescrValid()}>Long Description (OPT_LONG_DESC=)</SectionSubTitle>
+              <SectionSubTitle valid={isLongDescrValid()}>Long Description</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleLongDescrChange}
                 valid={isLongDescrValid()}
@@ -412,7 +441,7 @@ const CreatePage = () => {
                 label={errors.long_descr}
                 variant="prop"
                 name="long_descr"/>
-              <SectionSubTitle valid={isSiteUrlValid()}>Website (OPT_SITE_URL=)</SectionSubTitle>
+              <SectionSubTitle valid={isSiteUrlValid()}>Website URL</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleSiteUrlChange}
                 valid={isSiteUrlValid()}
@@ -420,7 +449,7 @@ const CreatePage = () => {
                 label={errors.site_url}
                 variant="prop"
                 name="site_url"/>
-              <SectionSubTitle valid={isPdfUrlValid()}>Description Paper (OPT_PDF_URL=)</SectionSubTitle>
+              <SectionSubTitle valid={isPdfUrlValid()}>Description Paper URL</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handlePdfUrlChange}
                 valid={isPdfUrlValid()}
@@ -428,7 +457,7 @@ const CreatePage = () => {
                 label={errors.pdf_url}
                 variant="prop"
                 name="pdf_url"/>
-              <SectionSubTitle valid={isFaviconUrlValid()}>Path to Favicon (OPT_FAVICON_URL=)</SectionSubTitle>
+              <SectionSubTitle valid={isFaviconUrlValid()}>Favicon URL</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleFaviconUrlChange}
                 valid={isFaviconUrlValid()}
@@ -436,7 +465,7 @@ const CreatePage = () => {
                 label={errors.favicon_url}
                 variant="prop"
                 name="favicon_url"/>
-              <SectionSubTitle valid={isLogoUrlValid()}>Path to Logo (OPT_LOGO_URL=)</SectionSubTitle>
+              <SectionSubTitle valid={isLogoUrlValid()}>Logo URL</SectionSubTitle>
               <Input placeholder=""
                 onChangeHandler={handleLogoUrlChange}
                 valid={isLogoUrlValid()}
@@ -444,8 +473,8 @@ const CreatePage = () => {
                 label={errors.logo_url}
                 variant="prop"
                 name="logo_url"/>
-              <SectionSubTitle valid={isColorValid()}>Color (OPT_COLOR=)</SectionSubTitle>
-              <Input placeholder=""
+              <SectionSubTitle valid={isColorValid()}>Color</SectionSubTitle>
+              <Input placeholder="#ffffff"
                 onChangeHandler={handleColorChange}
                 valid={isColorValid()}
                 value={values.color}

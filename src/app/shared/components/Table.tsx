@@ -15,10 +15,11 @@ interface TableProps {
   dataToHighlight: any[];
   config: CellConfig[];
   rowOnClick?: (value: any) => any;
+  searchedBy?: string;
 }
 
 const StyledTable = styled.table`
-  width: 80%;
+  width: 95%;
   margin: 0 auto;
   > tbody tr:last-child td:first-child {
     border-bottom-left-radius: 10px;
@@ -53,11 +54,11 @@ const Header = styled.th<{ active: boolean }>`
     }
     return active ? '#ffffff' : '#8da1ad';
   }};
-  padding: 15px 30px;
+  padding: 15px 12px;
 `;
 
 const Column = styled.td`
-  padding: 20px 30px;
+  padding: 15px 12px;
   background-color: rgba(13, 77, 118, .9);
   max-width: 100px;
   white-space: nowrap;
@@ -76,33 +77,42 @@ const bodyClass = css`
   }
 `;
 
-const Table: React.FC<TableProps> = ({ keyBy, data, dataToHighlight, config, rowOnClick }) => {
-  const [receiveClickedId, setActiveReceive] = useState(null);
-  const isInProgress =  false 
-
-  const [filterBy, setFilterBy] = useState(0);
+const Table: React.FC<TableProps> = ({ keyBy, data, dataToHighlight, config, rowOnClick, searchedBy }) => {
   const updateTableData = (newData) => {
     let res = [...newData];
-    res = res.sort(sortFn);
-    dataToHighlight.forEach(item => {
-      const index = res.findIndex(resItem => resItem.aid == item.aid);
-      const spliced = res.splice(index, 1);
-      res.unshift(spliced[0]);
-    });
-    
+    res = res.sort(sortFn);    
     return res;
   };
 
-  let tableData = updateTableData(data);
+  const [filterBy, setFilterBy] = useState(4);
+  const [td, setTd] = useState(updateTableData(data));
+  const [tdTmp, setTdTmp] = useState([]);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   useEffect(() => {
-    tableData = updateTableData(data);
-  },[data]);
+    if (searchedBy.length === 0) {
+      setTd(updateTableData(data));
+    }
+    setTdTmp(data);
+  }, [data]);
+
+  useEffect(() => {
+    if (searchedBy.length > 0) {
+      setIsSearchActive(true);
+      const filteredData = tdTmp.filter((item) => {
+        return item.aid.toString().includes(searchedBy) || 
+          item.minted_by.toLowerCase().includes(searchedBy) || (item.coin ? item.coin.toLowerCase().includes(searchedBy) : false);
+      })
+      setTd(updateTableData(filteredData));
+    } else if (searchedBy.length === 0 && isSearchActive) {
+      setTd(updateTableData(tdTmp));
+    }
+  }, [searchedBy]);
 
   const sortFn = (objectA, objectB) => {
     const name = config[Math.abs(filterBy)].name;
-    const a = objectA[name];
-    const b = objectB[name];
+    const a = typeof objectA[name] == 'string' ? objectA[name].toLowerCase() : objectA[name];
+    const b = typeof objectB[name] == 'string' ? objectB[name].toLowerCase() : objectB[name];
 
     if (a === b) {
       return 0;
@@ -135,7 +145,7 @@ const Table: React.FC<TableProps> = ({ keyBy, data, dataToHighlight, config, row
         </tr>
       </StyledThead>
       <tbody className={bodyClass}>
-        {tableData && tableData.length > 0 ? tableData.map((item, index) => (
+        {td && td.length > 0 ? td.sort(sortFn).map((item, index) => (
           <TableTr key={index} isMine={dataToHighlight.some(el => el.aid === item.aid)}>
             {config.map(({ name, fn }, itemIndex) => {
               const value = item[name];

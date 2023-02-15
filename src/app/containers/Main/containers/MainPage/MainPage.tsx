@@ -4,30 +4,36 @@ import { css } from '@linaria/core';
 
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Window, Button, Table, Rate, AssetIcon } from '@app/shared/components';
+import { Window, Button, Table, Rate, AssetIcon, Input } from '@app/shared/components';
 import { selectAppParams,  selectOwnedAssetsList,  selectRate } from '../../store/selectors';
 import { IconSend, IconReceive } from '@app/shared/icons';
 import { ROUTES, CID } from '@app/shared/constants';
 import { selectAssetsList } from '../../store/selectors';
 import { Asset } from '@app/core/types';
-import { calcMintedAmount, fromGroths } from '@core/appUtils';
 import { selectSystemState } from '@app/shared/store/selectors';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 50px 0;
+  margin-bottom: 50px;
 `;
 
-const StyledControls = styled.div`
-  margin-top: 50px;
+const TopContainer = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
+  width: 95%;
+
+  > .create-asset {
+    margin: 10px 0 0 auto;
+    width: 200px;
+    height: 38px;
+  }
 `;
 
 const StyledTable = styled.div`
-  margin-top: 30px;
+  margin-top: 20px;
   width: 100%;
   overflow: hidden;
 `;
@@ -45,7 +51,7 @@ const MainPage: React.FC = () => {
   const dispatch = useDispatch();
   const assetsList = useSelector(selectAssetsList());
   const ownedAssetsList = useSelector(selectOwnedAssetsList());
-  const systemState = useSelector(selectSystemState());
+  const [searchValue, setSearchValue] = useState('');
 
   const TABLE_CONFIG = [
     {
@@ -72,8 +78,16 @@ const MainPage: React.FC = () => {
       title: 'Minted amount',
       fn: (value: any, asset: Asset, index: number) => {
         return (<>
-          {fromGroths(parseInt(calcMintedAmount(asset.mintedLo, asset.mintedHi)))}
+          {asset['minted']}
         </>);
+      }
+    }, {
+      name: 'max_supply',
+      title: 'Max supply',
+      fn: (value: any, asset: Asset, index: number) => {
+        return <span>
+          {asset['max_supply']}
+        </span>
       }
     }, {
       name: 'minted_by',
@@ -81,13 +95,7 @@ const MainPage: React.FC = () => {
       fn: (value: any, asset: Asset, index: number) => {
         return (<>
           {
-            asset.owner_pk !== undefined && <>Wallet</>
-          }
-          {
-            asset.owner_cid !== undefined && asset.owner_cid === CID && <>Asset Minter</>
-          }
-          {
-            asset.owner_cid !== undefined && asset.owner_cid !== CID && <>Contract {asset.owner_cid}</>
+            asset['minted_by']
           }
         </>);
       }
@@ -95,12 +103,8 @@ const MainPage: React.FC = () => {
       name: 'emission',
       title: 'First emission',
       fn: (value: any, asset: Asset, index: number) => {
-        const heightDiff = systemState.current_height - asset.height;
-        const timestampDiff = systemState.current_state_timestamp * 1000 - heightDiff * 60000;
-        const dateDiff = new Date(timestampDiff);
-        const dateFromString = ('0' + dateDiff.getDate()).slice(-2) + '.' 
-          + ('0' + (dateDiff.getMonth()+1)).slice(-2) + '.' + dateDiff.getFullYear();
-
+        const dateFromString = ('0' + asset['emission'].getDate()).slice(-2) + '.' 
+          + ('0' + (asset['emission'].getMonth()+1)).slice(-2) + '.' + asset['emission'].getFullYear();
         return (<span className='date'>
           {dateFromString}
         </span>);
@@ -115,17 +119,25 @@ const MainPage: React.FC = () => {
   const handleAssetClick: React.MouseEventHandler = (item) => {
     navigate(`${ROUTES.MAIN.ASSET_PAGE.replace(':id', '')}${item['aid']}`);
   };
+  
+  const onSearchInput = (value: string) => {
+    setSearchValue(value);
+  };
 
   return (
     <>
       <Window>
         <Container>
-          <Button
-            onClick={handleCreateClick}
-            pallete="green" 
-            variant="regular">create asset</Button>
+          <TopContainer>
+            <Input onChangeHandler={onSearchInput} placeholder='Search by id, coin, minted by' variant='gray' />
+            <Button
+              className='create-asset'
+              onClick={handleCreateClick}
+              pallete="green" 
+              variant="regular">create asset</Button>
+          </TopContainer>
           <StyledTable>
-            <Table config={TABLE_CONFIG} rowOnClick={handleAssetClick}
+            <Table config={TABLE_CONFIG} searchedBy={searchValue} rowOnClick={handleAssetClick}
               data={assetsList} dataToHighlight={ownedAssetsList} keyBy='aid'/>
               { assetsList.length === 0 && 
                 <EmptyTableContent>There are no assets yet</EmptyTableContent> }

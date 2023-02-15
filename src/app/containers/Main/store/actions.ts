@@ -15,7 +15,7 @@ export const setDonatedBeamx = createAction('@@MAIN/SET_DONATED_BEAMX')<number>(
 export const setIsInProgress = createAction('@@MAIN/SET_IS_IN_PROGRESS')<boolean>();
 export const setFeeValues = createAction('@@MAIN/SET_FEE_VALUES')<any>();
 
-export const setPopupState = createAction('@@MAIN/SET_POPUP_STATE')<{type: string, state: boolean, aid?: string, ratio?: string}>();
+export const setPopupState = createAction('@@MAIN/SET_POPUP_STATE')<{type: string, state: boolean, aid?: string, ratio?: string, n?: string}>();
 
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',
