@@ -143,6 +143,15 @@ const CreatePage = () => {
         color.length > 0 ? 'OPT_COLOR=' + color + ';' : ''}`;
   };
 
+  const isValidUrl = (url: string) => {
+    try { 
+      return Boolean(new URL(url)) 
+    }
+    catch(e){ 
+      return false 
+    }
+  }
+
   const generateRegCommand = (metadata: string) => {
     return `${COMMAND_BASIS_START}${metadata}${COMMAND_BASIS_END}`;
   };
@@ -239,19 +248,19 @@ const CreatePage = () => {
       errorsValidation.long_descr = `Value is too big`;
     }
 
-    if (site_url.length > 0 && !url_regex.test(site_url)) {
+    if (site_url.length > 0 && !isValidUrl(site_url)) {
       errorsValidation.site_url = `Wrong url format`;
     }
 
-    if (pdf_url.length > 0 && !url_regex.test(pdf_url)) {
+    if (pdf_url.length > 0 && !isValidUrl(pdf_url)) {
       errorsValidation.pdf_url = `Wrong url format`;
     }
 
-    if (favicon_url.length > 0 && !url_regex.test(favicon_url)) {
+    if (favicon_url.length > 0 && !isValidUrl(favicon_url)) {
       errorsValidation.favicon_url = `Wrong url format`;
     }
 
-    if (logo_url.length > 0 && !url_regex.test(logo_url)) {
+    if (logo_url.length > 0 && !isValidUrl(logo_url)) {
       errorsValidation.logo_url = `Wrong url format`;
     }
 
